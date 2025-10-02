@@ -1,4 +1,4 @@
-name: Mock Banking System CI/CD
+name: Cartoon Rental API System CI/CD
 
 on:
   push:
