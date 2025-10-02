@@ -18,5 +18,5 @@ class UserRolePermission(models.Model):
 
     permission_id = models.AutoField(primary_key=True)
     created_date = models.DateTimeField(auto_now_add=True)
-    action = models.CharField(max_length=10, choices=ActionOptions.choices, default=ActionOptions.READ)
+    action = models.CharField(max_length=10, choices=ActionOptions.choices)
     description = models.TextField(blank=True, null=True)

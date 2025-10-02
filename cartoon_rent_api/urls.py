@@ -18,13 +18,15 @@ Including another URLconf
 import os
 
 from django.contrib import admin
-from django.urls import path
+from django.urls import include, path
 from drf_spectacular.views import SpectacularAPIView, SpectacularRedocView, SpectacularSwaggerView
 
 default_api_context_path = os.getenv("API_CONTEXT_PATH", "api/v1/")
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path(f'{default_api_context_path}', include('user_management.urls')),
+    path(f'{default_api_context_path}', include('rental_management.urls')),
     path(f'{default_api_context_path}/schema/', SpectacularAPIView.as_view(), name='schema'),
     path(
         f'{default_api_context_path}/schema/swagger-ui/',
