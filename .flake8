@@ -1,0 +1,5 @@
+[flake8]
+max-line-length = 120
+exclude = */migrations/*, .git/*, __pycache__, manage.py
+extend-ignore = E203, ANN101, ANN102
+supress-none-returning = True

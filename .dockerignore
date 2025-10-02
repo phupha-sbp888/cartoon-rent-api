@@ -1,0 +1,9 @@
+static
+data
+.DS_Store
+.git
+Dockerfile
+docker-compose.yml
+.flake8
+.env
+__pycache__

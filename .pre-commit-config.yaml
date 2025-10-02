@@ -1,0 +1,52 @@
+# Pre commit hook for linting
+# See https://pre-commit.com for more information i.e how to use hook
+# See https://pre-commit.com/hooks.html for more hooks
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v5.0.0
+    hooks:
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+        exclude: ^.*\.ipynb
+      - id: check-yaml
+      - id: check-added-large-files
+      - id: check-toml
+      - id: detect-private-key
+      - id: check-ast
+  - repo: https://github.com/pycqa/isort
+    rev: 6.0.1
+    hooks:
+      - id: isort
+        name: Sort imports alphabetically
+  - repo: https://github.com/psf/black
+    rev: 25.1.0
+    hooks:
+      - id: black
+        name: Black
+        exclude: ^.+\/migrations\/.+
+  - repo: https://github.com/psf/black
+    rev: 25.1.0
+    hooks:
+      - id: black-jupyter
+  - repo: https://github.com/pycqa/flake8
+    rev: 7.2.0
+    hooks:
+      - id: flake8
+        name: Check coding style (PEP8)
+        additional_dependencies:
+          - flake8-annotations
+          - flake8-docstrings
+  - repo: local
+    hooks:
+      - id: commit-msg
+        name: commit message should have tag (test:, feat:, fix:, build:, docs:, refactor:)
+        language: pygrep
+        entry: '\A^(?!test|feat|fix|build|docs|refactor:)'
+        args: [ --multiline ]
+        stages: [ commit-msg ]
+# It is recommended to specify the latest version of Python
+# supported by your project here, or alternatively use
+# pre-commit's default_language_version, see
+# https://pre-commit.com/#top_level-default_language_version
+default_language_version:
+  python: python3.13
