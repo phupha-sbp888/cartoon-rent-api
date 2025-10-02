@@ -15,4 +15,10 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 
-urlpatterns = []
+from django.urls import include, path
+
+from user_management.urls.role_url import role_urls
+
+role_base_context_path = "roles/"
+
+urlpatterns = [path(f'{role_base_context_path}', include((role_urls, 'roles'), namespace='roles'))]
