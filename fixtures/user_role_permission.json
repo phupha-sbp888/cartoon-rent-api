@@ -1,0 +1,47 @@
+[
+    {
+        "model": "user_management.userrolepermission",
+        "pk": 1,
+        "fields": {
+            "action": "CREATE",
+            "created_date": "2025-10-02T10:38:24.070Z",
+            "description": "Allow assigned role to create resources."
+        }
+    },
+    {
+        "model": "user_management.userrolepermission",
+        "pk": 2,
+        "fields": {
+            "action": "READ_ALL",
+            "created_date": "2025-10-02T10:38:24.070Z",
+            "description": "Allow assigned role to read all records."
+        }
+    },
+    {
+        "model": "user_management.userrolepermission",
+        "pk": 3,
+        "fields": {
+            "action": "UPDATE",
+            "created_date": "2025-10-02T10:38:24.070Z",
+            "description": "Allow assigned role to update all records."
+        }
+    },
+    {
+        "model": "user_management.userrolepermission",
+        "pk": 4,
+        "fields": {
+            "action": "DELETE",
+            "created_date": "2025-10-02T10:38:24.070Z",
+            "description": "Allow assigned role to delete records."
+        }
+    },
+    {
+        "model": "user_management.userrolepermission",
+        "pk": 5,
+        "fields": {
+            "action": "ALL",
+            "created_date": "2025-10-02T10:38:24.070Z",
+            "description": "Allow assigned role to have all permission in the system, except user management site."
+        }
+    }
+]
