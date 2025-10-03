@@ -18,7 +18,12 @@ Including another URLconf
 from django.urls import include, path
 
 from user_management.urls.role_url import role_urls
+from user_management.urls.user_url import user_urls
 
 role_base_context_path = "roles/"
+user_base_context_path = "users/"
 
-urlpatterns = [path(f'{role_base_context_path}', include((role_urls, 'roles'), namespace='roles'))]
+urlpatterns = [
+    path(f'{role_base_context_path}', include((role_urls, 'roles'), namespace='roles')),
+    path(f'{user_base_context_path}', include((user_urls, 'users'), namespace='users')),
+]
