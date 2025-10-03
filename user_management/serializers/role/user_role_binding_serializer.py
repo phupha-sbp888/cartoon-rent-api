@@ -5,7 +5,7 @@ from rest_framework import serializers
 from user_management.models.user_role_binding_model import UserRoleBinding
 
 
-class UserRoleBindingSerializer(serializers.ModelField):
+class UserRoleBindingSerializer(serializers.ModelSerializer):
     """Model serializer for assigning user role.
 
     Validating input and serialize output for assigning user role related endpoints.
