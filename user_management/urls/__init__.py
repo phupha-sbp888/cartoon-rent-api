@@ -17,13 +17,16 @@ Including another URLconf
 
 from django.urls import include, path
 
+from user_management.urls.permissions_url import permission_urls
 from user_management.urls.role_url import role_urls
 from user_management.urls.user_url import user_urls
 
 role_base_context_path = "roles/"
 user_base_context_path = "users/"
+permission_base_context_path = "permission/"
 
 urlpatterns = [
     path(f'{role_base_context_path}', include((role_urls, 'roles'), namespace='roles')),
+    path(f'{permission_base_context_path}', include((permission_urls, 'permission'), namespace='permission')),
     path(f'{user_base_context_path}', include((user_urls, 'users'), namespace='users')),
 ]

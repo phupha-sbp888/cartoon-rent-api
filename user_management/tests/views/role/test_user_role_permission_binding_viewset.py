@@ -31,7 +31,7 @@ class TestUserRolePermissionBindingViewSet(APITestCase):
 
     def test_list_user_role_permission_bindings(self) -> None:
         """Test listing all user role permission bindings."""
-        url: str = reverse("roles:list-role-permission-bindings")
+        url: str = reverse("permission:list-role-permission-bindings")
         response: Response = self.client.get(url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertGreaterEqual(len(response.data), 1)
@@ -39,7 +39,7 @@ class TestUserRolePermissionBindingViewSet(APITestCase):
     def test_retrieve_user_role_permission_binding(self) -> None:
         """Test retrieving a specific user role permission binding by ID."""
         url: str = reverse(
-            "roles:retrieve-role-permission-binding", args=[self.role_permission_binding.permission_binding_id]
+            "permission:retrieve-role-permission-binding", args=[self.role_permission_binding.permission_binding_id]
         )
         response: Response = self.client.get(url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -47,14 +47,14 @@ class TestUserRolePermissionBindingViewSet(APITestCase):
 
         # Test retrieving a non existing binding ID
         url: str = reverse(
-            "roles:retrieve-role-permission-binding", args=[self.role_permission_binding.permission_binding_id + 1]
+            "permission:retrieve-role-permission-binding", args=[self.role_permission_binding.permission_binding_id + 1]
         )
         response: Response = self.client.get(url)
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
     def test_create_user_role_permission_binding(self) -> None:
         """Test assigning a new user role permission."""
-        url: str = reverse("roles:create-role-permission-binding")
+        url: str = reverse("permission:create-role-permission-binding")
         valid_binding_input: Dict[str, int] = {"role_id": self.user_role.role_id, "permission_id": 2}
         response: Response = self.client.post(url, data=valid_binding_input)
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
@@ -76,7 +76,7 @@ class TestUserRolePermissionBindingViewSet(APITestCase):
     def test_update_user_role_permission_binding(self) -> None:
         """Test updating a specific user role permission binding by ID."""
         url: str = reverse(
-            "roles:update-role-permission-binding", args=[self.role_permission_binding.permission_binding_id]
+            "permission:update-role-permission-binding", args=[self.role_permission_binding.permission_binding_id]
         )
         valid_binding_update_input: Dict[str, int] = {"role_id": self.user_role.role_id, "permission_id": 3}
         response: Response = self.client.put(url, data=valid_binding_update_input)
@@ -95,7 +95,7 @@ class TestUserRolePermissionBindingViewSet(APITestCase):
     def test_partial_update_user_role_permission_binding(self) -> None:
         """Test partially updating a specific user role permission binding by ID."""
         url: str = reverse(
-            "roles:update-role-permission-binding", args=[self.role_permission_binding.permission_binding_id]
+            "permission:update-role-permission-binding", args=[self.role_permission_binding.permission_binding_id]
         )
         valid_binding_update_input: Dict[str, int] = {"permission_id": 4}
         response: Response = self.client.patch(url, data=valid_binding_update_input)
@@ -105,7 +105,7 @@ class TestUserRolePermissionBindingViewSet(APITestCase):
     def test_delete_user_role_permission_binding(self) -> None:
         """Test deleting a specific user role permission binding by ID."""
         url: str = reverse(
-            "roles:delete-role-permission-binding", args=[self.role_permission_binding.permission_binding_id]
+            "permission:delete-role-permission-binding", args=[self.role_permission_binding.permission_binding_id]
         )
         response: Response = self.client.delete(url)
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
