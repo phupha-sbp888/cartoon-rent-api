@@ -33,7 +33,7 @@ class BookUserManager(BaseUserManager):
 
 
 class User(AbstractBaseUser):
-    """Model for defining users to be used for rental system authentication and user management API ."""
+    """Model for defining users to be used for rental system authentication and user management API."""
 
     user_id = models.BigAutoField(primary_key=True)
     username = models.CharField(max_length=150, unique=True)

@@ -17,8 +17,8 @@ class TestUserViewSet(APITestCase):
     @classmethod
     def setUpTestData(cls) -> None:
         """Set up test data."""
-        cls.admin_user = admin_user_recipe.make()
-        cls.normal_user = normal_user_recipe.make()
+        cls.admin_user: User = admin_user_recipe.make()
+        cls.normal_user: User = normal_user_recipe.make()
         cls.valid_user_create_input: Dict[str, Union[str, int]] = {
             "username": "testuser",
             "password": "testpassword",
@@ -30,11 +30,11 @@ class TestUserViewSet(APITestCase):
 
     def _validate_response_data(self, response: Response, expected_data: Dict[str, Union[bool, str, int]]) -> None:
         """Validate nessesary fields in user response data."""
-        self.assertEqual(response.data["username"], self.valid_user_create_input["username"])
-        self.assertEqual(response.data["email"], self.valid_user_create_input["email"])
-        self.assertEqual(response.data["age"], self.valid_user_create_input["age"])
-        self.assertEqual(response.data["first_name"], self.valid_user_create_input["first_name"])
-        self.assertEqual(response.data["last_name"], self.valid_user_create_input["last_name"])
+        self.assertEqual(response.data["username"], expected_data["username"])
+        self.assertEqual(response.data["email"], expected_data["email"])
+        self.assertEqual(response.data["age"], expected_data["age"])
+        self.assertEqual(response.data["first_name"], expected_data["first_name"])
+        self.assertEqual(response.data["last_name"], expected_data["last_name"])
 
     def test_list_users(self) -> None:
         """Test listing all users."""
