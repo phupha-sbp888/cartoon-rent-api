@@ -15,4 +15,10 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 
-urlpatterns = []
+from django.urls import include, path
+
+from rental_management.urls.tag_url import tag_urls
+
+tag_base_context_path = "tags/"
+
+urlpatterns = [path(f'{tag_base_context_path}', include((tag_urls, 'tags'), namespace='tags'))]
