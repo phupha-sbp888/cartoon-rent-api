@@ -30,6 +30,6 @@ role_urls = [
     path(
         "delete-binding/<int:role_binding_id>",
         UserRoleBindingViewSet.as_view({'delete': 'destroy'}),
-        name="update-role-binding",
+        name="delete-role-binding",
     ),
 ]

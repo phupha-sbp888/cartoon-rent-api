@@ -11,7 +11,7 @@ from rest_framework.test import APITestCase
 from user_management.models.user_role_model import UserRole
 from user_management.models.user_role_permission_binding_model import UserRolePermissionBinding
 from user_management.models.user_role_permission_model import UserRolePermission
-from user_management.tests.baker_recipe.user_role_recipe import user_role_recipe
+from user_management.tests.baker_recipe.user_role_recipe import manager_role_recipe
 
 
 class TestUserRolePermissionBindingViewSet(APITestCase):
@@ -23,7 +23,7 @@ class TestUserRolePermissionBindingViewSet(APITestCase):
     def setUpTestData(cls) -> None:
         """Set up test data."""
         fixture_permissions: UserRolePermission = UserRolePermission.objects.first()
-        existing_role: UserRole = user_role_recipe.make()
+        existing_role: UserRole = manager_role_recipe.make()
         cls.role_permission_binding: UserRolePermissionBinding = Recipe(
             UserRolePermissionBinding, role_id=existing_role, permission_id=fixture_permissions
         ).make()
@@ -34,7 +34,7 @@ class TestUserRolePermissionBindingViewSet(APITestCase):
         url: str = reverse("permission:list-role-permission-bindings")
         response: Response = self.client.get(url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertGreaterEqual(len(response.data), 1)
+        self.assertEqual(len(response.data), 1)
 
     def test_retrieve_user_role_permission_binding(self) -> None:
         """Test retrieving a specific user role permission binding by ID."""

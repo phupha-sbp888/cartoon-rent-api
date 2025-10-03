@@ -7,7 +7,7 @@ from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.test import APITestCase
 
-from user_management.tests.baker_recipe.user_role_recipe import user_role_recipe
+from user_management.tests.baker_recipe.user_role_recipe import manager_role_recipe
 
 
 class TestUserRoleViewSet(APITestCase):
@@ -16,7 +16,7 @@ class TestUserRoleViewSet(APITestCase):
     @classmethod
     def setUpTestData(cls) -> None:
         """Set up test data."""
-        cls.role = user_role_recipe.make()
+        cls.role = manager_role_recipe.make()
 
     def test_create_user_role(self) -> None:
         """Test creating a new user role."""
