@@ -1,4 +1,4 @@
-"""VModel viewset for user role related operations."""
+"""Model viewset for user role related operations."""
 
 from rest_framework.viewsets import ModelViewSet
 
