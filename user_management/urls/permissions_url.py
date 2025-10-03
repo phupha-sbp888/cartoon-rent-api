@@ -2,7 +2,7 @@
 
 from django.urls import path
 
-from user_management.views.role.user_role_permission_binding_viewset import UserRolePermissionBindingViewSet
+from user_management.views.permission.user_role_permission_binding_viewset import UserRolePermissionBindingViewSet
 
 permission_urls = [
     path(
