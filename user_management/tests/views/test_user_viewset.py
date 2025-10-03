@@ -19,7 +19,7 @@ class TestUserViewSet(APITestCase):
         """Set up test data."""
         cls.admin_user = admin_user_recipe.make()
         cls.normal_user = normal_user_recipe.make()
-        cls.valid_user_create_input: Dict[str, Union[bool, str, int]] = {
+        cls.valid_user_create_input: Dict[str, Union[str, int]] = {
             "username": "testuser",
             "password": "testpassword",
             "email": "test@email.com",
