@@ -8,6 +8,7 @@ from rest_framework.response import Response
 from rest_framework.test import APITestCase
 
 from rental_management.tests.baker_recipe.tag_recipe import tag_1_recipe
+from user_management.tests.baker_recipe.user_recipe import admin_user_recipe
 
 
 class TestTagVieSet(APITestCase):
@@ -17,6 +18,7 @@ class TestTagVieSet(APITestCase):
     def setUpTestData(cls) -> None:
         """Set up test data."""
         cls.tag = tag_1_recipe.make()
+        cls.admin_user = admin_user_recipe.make()
 
     def test_create_tag(self) -> None:
         """Test creating a new tag."""
@@ -61,6 +63,15 @@ class TestTagVieSet(APITestCase):
 
     def test_update_tag(self) -> None:
         """Test updating a tag information by id."""
+        url: str = reverse("tags:update-tag", args=[self.tag.tag_id])
+        valid_tag_input: Dict[str, str] = {"name": "test_update", "created_by": self.admin_user.user_id}
+        response: Response = self.client.put(url, data=valid_tag_input)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data["name"], valid_tag_input["name"])
+        self.assertEqual(response.data["created_by"], valid_tag_input["created_by"])
+
+    def test_partial_update_tag(self) -> None:
+        """Test partially updating a tag information by id."""
         url: str = reverse("tags:update-tag", args=[self.tag.tag_id])
         valid_tag_input: Dict[str, str] = {"name": "test_update"}
         response: Response = self.client.patch(url, data=valid_tag_input)
