@@ -12,6 +12,6 @@ class Book(models.Model):
     book_id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=255, null=False, blank=False)
     created_date = models.DateTimeField(auto_now_add=True)
-    created_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
+    created_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
     status = models.CharField(max_length=20, choices=BookStatusType.choices, default=BookStatusType.AVAILABLE)
     author = models.CharField(max_length=255, null=False, blank=False)
