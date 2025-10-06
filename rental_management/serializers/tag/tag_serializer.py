@@ -1,4 +1,4 @@
-"""API model serializer for imput and output of tag representation."""
+"""API model serializer for input and output of tag representation."""
 
 from rest_framework import serializers
 

@@ -17,8 +17,13 @@ Including another URLconf
 
 from django.urls import include, path
 
+from rental_management.urls.book_url import book_urls
 from rental_management.urls.tag_url import tag_urls
 
 tag_base_context_path = "tags/"
+book_base_context_path = "books/"
 
-urlpatterns = [path(f'{tag_base_context_path}', include((tag_urls, 'tags'), namespace='tags'))]
+urlpatterns = [
+    path(f'{tag_base_context_path}', include((tag_urls, 'tags'), namespace='tags')),
+    path(f'{book_base_context_path}', include((book_urls, 'books'), namespace='books')),
+]
