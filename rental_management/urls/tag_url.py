@@ -12,12 +12,18 @@ tag_urls = [
     path("update/<int:tag_id>", TagViewSet.as_view({"put": "update", "patch": "partial_update"}), name="update-tag"),
     path("delete/<int:tag_id>", TagViewSet.as_view({"delete": "destroy"}), name="delete-tag"),
     path("list-binding", TagBindingViewSet.as_view({"get": "list"}), name="list-tag-binding"),
-    path("binding/<int:tag_id>", TagBindingViewSet.as_view({"get": "retrieve"}), name="retrieve-tag-binding"),
+    path(
+        "binding/<int:book_tag_binding_id>", TagBindingViewSet.as_view({"get": "retrieve"}), name="retrieve-tag-binding"
+    ),
     path("assign", TagBindingViewSet.as_view({"post": "create"}), name="assign-tags"),
     path(
-        "update-binding/<int:tag_id>",
+        "update-binding/<int:book_tag_binding_id>",
         TagBindingViewSet.as_view({"put": "update", "patch": "partial_update"}),
         name="update-tag-binding",
     ),
-    path("delete-binding/<int:tag_id>", TagBindingViewSet.as_view({"delete": "destroy"}), name="unassign-tags"),
+    path(
+        "delete-binding/<int:book_tag_binding_id>",
+        TagBindingViewSet.as_view({"delete": "destroy"}),
+        name="unassign-tags",
+    ),
 ]
