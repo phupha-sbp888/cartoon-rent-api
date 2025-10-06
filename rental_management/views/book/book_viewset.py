@@ -13,8 +13,8 @@ class BookViewSet(ModelViewSet):
     - GET: list all available books
     - GET (with book id): retrieve a specific book information
     - POST: create a  new book
-    - PUT/PATCH (with tag id): update a specific book by ID
-    - DELETE (with tag id): delete a specific book by ID
+    - PUT/PATCH (with book id): update a specific book by ID
+    - DELETE (with book id): delete a specific book by ID
     """
 
     serializer_class = BookSerializer
