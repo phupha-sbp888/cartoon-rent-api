@@ -11,6 +11,7 @@ from rest_framework.response import Response
 from rest_framework.test import APITestCase
 
 from rental_management.enums.rent_status_type import RentStatusType
+from rental_management.models.book_model import Book
 from rental_management.models.rent_history_model import RentHistoryModel
 from rental_management.tests.baker_recipe.book_recipe import available_book_recipe, rented_book_recipe
 from user_management.tests.baker_recipe.user_recipe import normal_user_recipe
@@ -31,6 +32,7 @@ class TestBookRentViewSet(APITestCase):
         cls.rented_book = rented_book
         cls.available_book = available_book
         cls.book_rent_user = book_rent_user
+        cls.unverify_book_record = Recipe(Book, name="").make()
 
     def test_list_book_rent_records(self) -> None:
         """Test listing all book rent records."""
@@ -127,6 +129,18 @@ class TestBookRentViewSet(APITestCase):
         }
         response: Response = self.client.post(url, data=invalid_book_rent_record_input)
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_create_book_rent_record_with_unverify_book_record(self) -> None:
+        """Test renting book with invalid field on book record."""
+        url: str = reverse("books:create-book-rent")
+        current_datetime: datetime = timezone.now()
+        invalid_book_rent_record_input: Dict[str, Union[str, int]] = {
+            "user_id": self.book_rent_user.user_id,
+            "book_id": self.unverify_book_record.book_id,
+            "rented_date": current_datetime.strftime("%Y-%m-%dT%H:%M:%SZ"),
+        }
+        response: Response = self.client.post(url, data=invalid_book_rent_record_input)
+        self.assertEqual(response.status_code, status.HTTP_500_INTERNAL_SERVER_ERROR)
 
     def test_update_book_rent_record(self) -> None:
         """Test updating book rent record."""
