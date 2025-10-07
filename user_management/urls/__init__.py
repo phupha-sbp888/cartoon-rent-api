@@ -33,6 +33,6 @@ urlpatterns = [
     path(f'{role_base_context_path}', include((role_urls, 'roles'), namespace='roles')),
     path(f'{permission_base_context_path}', include((permission_urls, 'permission'), namespace='permission')),
     path(f'{user_base_context_path}', include((user_urls, 'users'), namespace='users')),
-    path('token', TokenObtainPairView.as_view(), name='token_obtain_pair'),
+    path('login', TokenObtainPairView.as_view(), name='token_obtain'),
     path('token/refresh', TokenRefreshView.as_view(), name='token_refresh'),
 ]
