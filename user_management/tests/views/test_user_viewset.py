@@ -1,6 +1,6 @@
 """Unittest scenario for CRUD API of user."""
 
-from typing import Dict, Union
+from typing import Dict, List, Union
 
 from django.urls import reverse
 from rest_framework import status
@@ -8,6 +8,7 @@ from rest_framework.response import Response
 from rest_framework.test import APITestCase
 
 from user_management.models.user_model import User
+from user_management.serializers.user.user_output_serializer import UserOutputSerializer
 from user_management.tests.baker_recipe.user_recipe import admin_user_recipe, normal_user_recipe
 
 
@@ -41,8 +42,13 @@ class TestUserViewSet(APITestCase):
         """Test listing all users."""
         url: str = reverse("users:list-users")
         response: Response = self.client.get(url)
+        expected_result: List[UserOutputSerializer] = [
+            UserOutputSerializer(self.normal_user).data,
+            UserOutputSerializer(self.admin_user).data,
+        ]
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(len(response.data), 2)
+        self.assertEqual(response.data["count"], 2)
+        self.assertEqual(response.data["results"], expected_result)
 
     def test_retrieve_user(self) -> None:
         """Test retrieving a specific user by ID."""

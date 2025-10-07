@@ -52,3 +52,8 @@ class User(AbstractBaseUser):
     REQUIRED_FIELDS = ['email', 'age', 'first_name', 'last_name']
 
     objects = BookUserManager()
+
+    class Meta:
+        """Set up default ordering on query user model."""
+
+        ordering = ["-created_date"]

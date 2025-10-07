@@ -20,3 +20,8 @@ class UserRolePermission(models.Model):
     created_date = models.DateTimeField(auto_now_add=True)
     action = models.CharField(max_length=10, choices=ActionOptions.choices)
     description = models.TextField(blank=True, null=True)
+
+    class Meta:
+        """Set up default ordering on query role permission model."""
+
+        ordering = ["-created_date"]

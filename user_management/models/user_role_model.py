@@ -10,3 +10,8 @@ class UserRole(models.Model):
     name = models.CharField(max_length=255, unique=True)
     description = models.TextField(blank=True, null=True)
     created_date = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        """Set up default ordering on query user role model."""
+
+        ordering = ["-created_date"]

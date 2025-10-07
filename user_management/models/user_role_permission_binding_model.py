@@ -16,6 +16,7 @@ class UserRolePermissionBinding(models.Model):
     created_date = models.DateTimeField(auto_now_add=True)
 
     class Meta:
-        """Set up unique constraint for role permission binding to prevent dupliate permission assignment."""
+        """Set up unique constraint to prevent duplicate permission assignment and default ordering on query."""
 
         constraints = [UniqueConstraint(fields=['role_id', 'permission_id'], name='unique_permission_per_role')]
+        ordering = ["-created_date"]

@@ -1,6 +1,6 @@
 """Unittest scenario for CRUD API of user role permission assignment."""
 
-from typing import Dict
+from typing import Dict, List
 
 from django.urls import reverse
 from model_bakery.recipe import Recipe
@@ -11,6 +11,9 @@ from rest_framework.test import APITestCase
 from user_management.models.user_role_model import UserRole
 from user_management.models.user_role_permission_binding_model import UserRolePermissionBinding
 from user_management.models.user_role_permission_model import UserRolePermission
+from user_management.serializers.permission.user_role_permission_binding_serializer import (
+    UserRolePermissionBindingSerializer,
+)
 from user_management.tests.baker_recipe.user_role_recipe import manager_role_recipe
 
 
@@ -32,9 +35,13 @@ class TestUserRolePermissionBindingViewSet(APITestCase):
     def test_list_user_role_permission_bindings(self) -> None:
         """Test listing all user role permission bindings."""
         url: str = reverse("permission:list-role-permission-bindings")
+        expecetd_result: List[UserRolePermissionBindingSerializer] = [
+            UserRolePermissionBindingSerializer(self.role_permission_binding).data
+        ]
         response: Response = self.client.get(url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(len(response.data), 1)
+        self.assertEqual(response.data["count"], 1)
+        self.assertEqual(response.data["results"], expecetd_result)
 
     def test_retrieve_user_role_permission_binding(self) -> None:
         """Test retrieving a specific user role permission binding by ID."""

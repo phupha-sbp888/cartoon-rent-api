@@ -1,7 +1,7 @@
 """Unit test for book renting service and history."""
 
 from datetime import datetime
-from typing import Dict, Union
+from typing import Dict, List, Union
 
 from django.urls import reverse
 from django.utils import timezone
@@ -13,6 +13,7 @@ from rest_framework.test import APITestCase
 from rental_management.enums.rent_status_type import RentStatusType
 from rental_management.models.book_model import Book
 from rental_management.models.rent_history_model import RentHistoryModel
+from rental_management.serializers.book.rent_history_serializer import RentHistorySerializer
 from rental_management.tests.baker_recipe.book_recipe import available_book_recipe, rented_book_recipe
 from user_management.tests.baker_recipe.user_recipe import normal_user_recipe
 
@@ -37,9 +38,11 @@ class TestBookRentViewSet(APITestCase):
     def test_list_book_rent_records(self) -> None:
         """Test listing all book rent records."""
         url: str = reverse("books:list-book-rent")
+        expected_result: List[RentHistorySerializer] = [RentHistorySerializer(self.rent_history).data]
         response: Response = self.client.get(url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(len(response.data), 1)
+        self.assertEqual(response.data["count"], 1)
+        self.assertEqual(response.data["results"], expected_result)
 
     def test_retrieve_book_rent_record(self) -> None:
         """Test retrieving book rent record with ID."""

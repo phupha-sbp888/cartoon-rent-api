@@ -15,3 +15,8 @@ class Book(models.Model):
     created_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
     status = models.CharField(max_length=20, choices=BookStatusType.choices, default=BookStatusType.AVAILABLE)
     author = models.CharField(max_length=255, null=False, blank=False)
+
+    class Meta:
+        """Set up default ordering on query book model."""
+
+        ordering = ["-created_date"]

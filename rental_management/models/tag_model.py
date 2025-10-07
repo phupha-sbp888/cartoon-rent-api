@@ -12,3 +12,8 @@ class Tag(models.Model):
     name = models.CharField(max_length=150, unique=True, null=False, blank=False)
     created_date = models.DateTimeField(auto_now_add=True)
     created_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
+
+    class Meta:
+        """Set up default ordering on query tag model."""
+
+        ordering = ["-created_date"]

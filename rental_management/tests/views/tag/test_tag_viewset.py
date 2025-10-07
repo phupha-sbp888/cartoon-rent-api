@@ -1,12 +1,13 @@
 """Unittest scenario for CRUD API of tag."""
 
-from typing import Dict
+from typing import Dict, List
 
 from django.urls import reverse
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.test import APITestCase
 
+from rental_management.serializers.tag.tag_serializer import TagSerializer
 from rental_management.tests.baker_recipe.tag_recipe import tag_1_recipe
 from user_management.tests.baker_recipe.user_recipe import admin_user_recipe
 
@@ -44,9 +45,11 @@ class TestTagVieSet(APITestCase):
     def test_list_tag(self) -> None:
         """Test listing all tags."""
         url: str = reverse("tags:list-tags")
+        expected_result: List[TagSerializer] = [TagSerializer(self.tag).data]
         response: Response = self.client.get(url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(len(response.data), 1)
+        self.assertEqual(response.data["count"], 1)
+        self.assertEqual(response.data["results"], expected_result)
 
     def test_retrieve_tag_id(self) -> None:
         """Test getting tag information by id."""

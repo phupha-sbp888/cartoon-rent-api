@@ -24,3 +24,8 @@ class RentHistoryModel(models.Model):
         default=0.0,
         validators=[MinValueValidator(0, "Late penalty fee can not be negative")],
     )
+
+    class Meta:
+        """Set up default ordering on query rent history review model."""
+
+        ordering = ["-rented_date"]

@@ -14,3 +14,9 @@ class BookReview(models.Model):
     book_id = models.ForeignKey(Book, on_delete=models.CASCADE)
     review_detail = models.TextField(null=False, blank=False)
     is_recommended = models.BooleanField(default=False)
+    created_date = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        """Set up default ordering on query book review model."""
+
+        ordering = ["-created_date"]

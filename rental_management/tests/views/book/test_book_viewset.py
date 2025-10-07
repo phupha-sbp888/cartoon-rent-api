@@ -1,6 +1,6 @@
 """Unittest scenario for book related CRUD API."""
 
-from typing import Dict
+from typing import Dict, List
 
 from django.urls import reverse
 from rest_framework import status
@@ -8,6 +8,7 @@ from rest_framework.response import Response
 from rest_framework.test import APITestCase
 
 from rental_management.enums.book_status_type import BookStatusType
+from rental_management.serializers.book.book_serializer import BookSerializer
 from rental_management.tests.baker_recipe.book_recipe import available_book_recipe
 from user_management.tests.baker_recipe.user_recipe import admin_user_recipe
 
@@ -72,9 +73,11 @@ class TestBookViewSet(APITestCase):
     def test_list_book(self) -> None:
         """Test listing all books."""
         url: str = reverse("books:list-books")
+        expected_result: List[BookSerializer] = [BookSerializer(self.available_book).data]
         response: Response = self.client.get(url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(len(response.data), 1)
+        self.assertEqual(response.data["count"], 1)
+        self.assertEqual(response.data["results"], expected_result)
 
     def test_retrieve_book_id(self) -> None:
         """Test getting book information by id."""

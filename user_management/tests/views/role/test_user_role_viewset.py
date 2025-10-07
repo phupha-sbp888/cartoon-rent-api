@@ -1,12 +1,13 @@
 """Unittest scenario for CRUD API of user role."""
 
-from typing import Dict
+from typing import Dict, List
 
 from django.urls import reverse
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.test import APITestCase
 
+from user_management.serializers.role.user_role_serializer import UserRoleSerializer
 from user_management.tests.baker_recipe.user_role_recipe import manager_role_recipe
 
 
@@ -38,9 +39,11 @@ class TestUserRoleViewSet(APITestCase):
     def test_list_user_roles(self) -> None:
         """Test listing all user roles."""
         url: str = reverse("roles:list-roles")
+        expected_result: List[UserRoleSerializer] = [UserRoleSerializer(self.role).data]
         response: Response = self.client.get(url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertGreaterEqual(len(response.data), 1)
+        self.assertEqual(response.data["count"], 1)
+        self.assertEqual(response.data["results"], expected_result)
 
     def test_retrieve_user_role(self) -> None:
         """Test retrieving a specific user role by ID."""

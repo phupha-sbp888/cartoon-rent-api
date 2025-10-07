@@ -15,6 +15,7 @@ class BookTagBinding(models.Model):
     created_date = models.DateTimeField(auto_now_add=True)
 
     class Meta:
-        """Set up unique constraint for tag binding to prevent dupliate tag assignment."""
+        """Set up unique constraint for tag binding to prevent dupliate tag assignment and default ordering."""
 
         constraints = [models.UniqueConstraint(fields=['book_id', 'tag_id'], name='unique_tag_per_book_record')]
+        ordering = ["-created_date"]
