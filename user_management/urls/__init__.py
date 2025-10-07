@@ -16,6 +16,10 @@ Including another URLconf
 """
 
 from django.urls import include, path
+from rest_framework_simplejwt.views import (
+    TokenObtainPairView,
+    TokenRefreshView,
+)
 
 from user_management.urls.permissions_url import permission_urls
 from user_management.urls.role_url import role_urls
@@ -29,4 +33,6 @@ urlpatterns = [
     path(f'{role_base_context_path}', include((role_urls, 'roles'), namespace='roles')),
     path(f'{permission_base_context_path}', include((permission_urls, 'permission'), namespace='permission')),
     path(f'{user_base_context_path}', include((user_urls, 'users'), namespace='users')),
+    path('token', TokenObtainPairView.as_view(), name='token_obtain_pair'),
+    path('token/refresh', TokenRefreshView.as_view(), name='token_refresh'),
 ]
