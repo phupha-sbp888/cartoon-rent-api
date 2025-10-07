@@ -35,6 +35,7 @@ class TestUserViewSet(APITestCase):
         self.assertEqual(response.data["age"], expected_data["age"])
         self.assertEqual(response.data["first_name"], expected_data["first_name"])
         self.assertEqual(response.data["last_name"], expected_data["last_name"])
+        self.assertTrue(response.data["is_active"])
 
     def test_list_users(self) -> None:
         """Test listing all users."""

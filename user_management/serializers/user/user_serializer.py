@@ -12,11 +12,14 @@ from user_management.models.user_model import User
 class UserSerializer(serializers.ModelSerializer):
     """Model serializer for serialzing input of user."""
 
+    is_active = serializers.BooleanField(default=True)
+
     class Meta:
         """Set up fields for serializing user model for create/update with password."""
 
         model = User
         fields = "__all__"
+        read_only_fields = ["last_login", "created_date"]
 
     def validate_email(self, raw_email_value: str) -> str:
         """Validate raw email by normalizing email for uppercase email domain.
