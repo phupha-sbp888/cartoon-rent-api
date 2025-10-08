@@ -10,11 +10,11 @@ if TYPE_CHECKING:
 
 
 class UserRoleViewSetAccessPolicy(AccessPolicy):
-    """Access policy defining user API permissions.
+    """Access policy defining user role API permissions.
 
     Permissions explanation:
-    1. Admin users can perform any operation on all other users.
-    2. Normal users such as client accounts can only view and update their own user information.
+    1. Admin users can perform any operation on all roles.
+    2. Normal users such as client accounts can only read roles.
     """
 
     statements = [

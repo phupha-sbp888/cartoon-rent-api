@@ -7,6 +7,8 @@ from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.test import APITestCase
 
+from user_management.models.user_model import User
+from user_management.models.user_role_model import UserRole
 from user_management.serializers.role.user_role_serializer import UserRoleSerializer
 from user_management.tests.baker_recipe.user_recipe import admin_user_recipe, normal_user_recipe
 from user_management.tests.baker_recipe.user_role_recipe import manager_role_recipe
@@ -18,9 +20,9 @@ class TestUserRoleViewSet(APITestCase):
     @classmethod
     def setUpTestData(cls) -> None:
         """Set up test data."""
-        cls.admin_user = admin_user_recipe.make()
-        cls.normal_user = normal_user_recipe.make()
-        cls.role = manager_role_recipe.make()
+        cls.admin_user: User = admin_user_recipe.make()
+        cls.normal_user: User = normal_user_recipe.make()
+        cls.role: UserRole = manager_role_recipe.make()
 
     def setUp(self) -> None:
         """Login with admin user."""
