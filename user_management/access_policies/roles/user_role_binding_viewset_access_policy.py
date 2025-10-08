@@ -11,7 +11,7 @@ if TYPE_CHECKING:
 
 
 class UserRoleBindingViewSetAccessPolicy(AccessPolicy):
-    """Access policy defining user API permissions.
+    """Access policy defining user role binding API permissions.
 
     Permissions explanation:
     1. Admin users can perform any operation on all role assignments.

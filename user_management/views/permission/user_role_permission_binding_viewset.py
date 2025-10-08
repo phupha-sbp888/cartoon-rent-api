@@ -2,6 +2,9 @@
 
 from rest_framework.viewsets import ModelViewSet
 
+from user_management.access_policies.permissions.user_role_permission_binding_viewset_access_policy import (
+    UserRolePermissionBindingAccessPolicy,
+)
 from user_management.models.user_role_permission_binding_model import UserRolePermissionBinding
 from user_management.serializers.permission.user_role_permission_binding_serializer import (
     UserRolePermissionBindingSerializer,
@@ -21,4 +24,5 @@ class UserRolePermissionBindingViewSet(ModelViewSet):
 
     serializer_class = UserRolePermissionBindingSerializer
     queryset = UserRolePermissionBinding.objects.all()
+    permission_classes = [UserRolePermissionBindingAccessPolicy]
     lookup_field = "permission_binding_id"
