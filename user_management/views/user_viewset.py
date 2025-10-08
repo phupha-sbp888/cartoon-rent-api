@@ -9,7 +9,7 @@ from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
 
-from user_management.access_policies.user_setting_access_policy import UserSettingAccessPolicy
+from user_management.access_policies.user_viewset_access_policy import UserViewSetAccessPolicy
 from user_management.models.user_model import User
 from user_management.serializers.user.user_output_serializer import UserOutputSerializer
 from user_management.serializers.user.user_serializer import UserSerializer
@@ -33,7 +33,7 @@ class UserViewSet(ModelViewSet):
 
     serializer_class = UserOutputSerializer
     queryset = User.objects.all()
-    permission_classes = [UserSettingAccessPolicy]
+    permission_classes = [UserViewSetAccessPolicy]
     lookup_field = "user_id"
 
     @transaction.atomic

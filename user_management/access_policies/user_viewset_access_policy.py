@@ -9,7 +9,7 @@ if TYPE_CHECKING:
     from user_management.views.user_viewset import UserViewSet
 
 
-class UserSettingAccessPolicy(AccessPolicy):
+class UserViewSetAccessPolicy(AccessPolicy):
     """Access policy defining user API permissions.
 
     Permissions explanation:
