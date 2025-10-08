@@ -35,15 +35,15 @@ class TestUserRoleBindingViewSet(APITestCase):
         cls.role_1: UserRole = existing_role_1
         cls.role_2: UserRole = existing_role_2
         cls.normal_user_1: User = normal_user_1
-        cls.normal_user_2: User = normal_user_recipe.make()
+        cls.normal_user_2: User = normal_user_2
         cls.admin_user: User = admin_user_recipe.make()
 
     def setUp(self) -> None:
         """Login with admin user privilege."""
         self.client.force_authenticate(user=self.admin_user)
 
-    def test_list_user_role_binding(self) -> None:
-        """Test listing all role bindings that are assigned to user."""
+    def test_list_user_role_binding_with_admin_user(self) -> None:
+        """Test listing all role bindings that are assigned to user with admin user."""
         url: str = reverse("roles:list-role-binding")
         response: Response = self.client.get(url)
         expected_result: List[UserRoleBindingSerializer] = [
@@ -54,12 +54,44 @@ class TestUserRoleBindingViewSet(APITestCase):
         self.assertEqual(response.data["count"], 2)
         self.assertEqual(response.data["results"], expected_result)
 
-    def test_retrieve_user_role_binding(self) -> None:
-        """Test retrieving a assigned role to user by ID."""
+    def test_list_user_role_binding_with_normal_user(self) -> None:
+        """Test listing all role bindings that are assigned to user with normal user."""
+        url: str = reverse("roles:list-role-binding")
+        self.client.force_authenticate(user=self.normal_user_1)
+        expected_result: List[UserRoleBindingSerializer] = [UserRoleBindingSerializer(self.role_binding_user_1).data]
+        response: Response = self.client.get(url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data["count"], 1)
+        self.assertEqual(response.data["results"], expected_result)
+
+        self.client.force_authenticate(user=self.normal_user_2)
+        expected_result: List[UserRoleBindingSerializer] = [UserRoleBindingSerializer(self.role_binding_user_2).data]
+        response: Response = self.client.get(url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data["count"], 1)
+        self.assertEqual(response.data["results"], expected_result)
+
+    def test_retrieve_user_role_binding_with_admin_user(self) -> None:
+        """Test retrieving a assigned role to user by ID with admin user."""
         url: str = reverse("roles:retrieve-role-binding", args=[self.role_binding_user_1.role_binding_id])
         response: Response = self.client.get(url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data["role_binding_id"], self.role_binding_user_1.role_binding_id)
+
+    def test_retrieve_user_role_binding_with_normal_user(self) -> None:
+        """Test retrieving a assigned role to user by ID with normal user."""
+        url: str = reverse("roles:retrieve-role-binding", args=[self.role_binding_user_1.role_binding_id])
+        self.client.force_authenticate(user=self.normal_user_1)
+        response: Response = self.client.get(url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data["role_binding_id"], self.role_binding_user_1.role_binding_id)
+
+    def test_retrieve_other_user_role_binding_with_normal_user(self) -> None:
+        """Test retrieving a assigned role to user by ID with normal user."""
+        url: str = reverse("roles:retrieve-role-binding", args=[self.role_binding_user_2.role_binding_id])
+        self.client.force_authenticate(user=self.normal_user_1)
+        response: Response = self.client.get(url)
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
     def test_retrieve_non_existing_role_binding(self) -> None:
         """Test retrieving a non existing assigned role to user by ID."""
@@ -81,6 +113,17 @@ class TestUserRoleBindingViewSet(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(response.data["role_id"], valid_role_assign_input["role_id"])
         self.assertEqual(response.data["user_id"], valid_role_assign_input["user_id"])
+
+    def test_assigning_role_to_user_with_insufficient_permission(self) -> None:
+        """Test assigning role to other users with normal user."""
+        url: str = reverse("roles:assign-roles")
+        valid_role_assign_input: Dict[str, int] = {
+            "role_id": self.role_2.role_id,
+            "user_id": self.normal_user_1.user_id,
+        }
+        self.client.force_authenticate(user=self.normal_user_1)
+        response: Response = self.client.post(url, data=valid_role_assign_input)
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
     def test_assigning_duplicate_role_to_user(self) -> None:
         """Test assigning duplicate role to the same user."""
@@ -120,6 +163,17 @@ class TestUserRoleBindingViewSet(APITestCase):
         self.assertEqual(response.data["role_id"], valid_role_binding_update_date["role_id"])
         self.assertEqual(response.data["user_id"], valid_role_binding_update_date["user_id"])
 
+    def test_update_role_binding_with_insufficient_permission(self) -> None:
+        """Test update existing role bindind to user with normal user."""
+        url: str = reverse("roles:update-role-binding", args=[self.role_binding_user_1.role_binding_id])
+        valid_role_binding_update_date: Dict[str, int] = {
+            "role_id": self.role_2.role_id,
+            "user_id": self.normal_user_1.user_id,
+        }
+        self.client.force_authenticate(user=self.normal_user_2)
+        response: Response = self.client.put(url, data=valid_role_binding_update_date)
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
     def test_update_role_binding_with_missing_role_id(self) -> None:
         """Test update existing role bindind without role id given."""
         url: str = reverse("roles:update-role-binding", args=[self.role_binding_user_1.role_binding_id])
@@ -142,8 +196,26 @@ class TestUserRoleBindingViewSet(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data["role_id"], valid_role_binding_update_date["role_id"])
 
+    def test_partially_update_role_binding_with_insufficient_permission(self) -> None:
+        """Test partially update existing role bindind to user with normal user."""
+        url: str = reverse("roles:update-role-binding", args=[self.role_binding_user_1.role_binding_id])
+        valid_role_binding_update_date: Dict[str, int] = {
+            "role_id": self.role_2.role_id,
+            "user_id": self.normal_user_1.user_id,
+        }
+        self.client.force_authenticate(user=self.normal_user_2)
+        response: Response = self.client.patch(url, data=valid_role_binding_update_date)
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
     def test_delete_user_role_binding(self) -> None:
         """Test delete existing role binding."""
         url: str = reverse("roles:delete-role-binding", args=[self.role_binding_user_1.role_binding_id])
         response: Response = self.client.delete(url)
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+
+    def test_delete_user_role_binding_with_insufficient_permission(self) -> None:
+        """Test delete existing role binding."""
+        url: str = reverse("roles:delete-role-binding", args=[self.role_binding_user_1.role_binding_id])
+        self.client.force_authenticate(user=self.normal_user_2)
+        response: Response = self.client.delete(url)
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
