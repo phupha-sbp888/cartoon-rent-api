@@ -22,6 +22,10 @@ class TestBookViewSet(APITestCase):
         cls.available_book = available_book_recipe.make()
         cls.admin_user = admin_user_recipe.make()
 
+    def setUp(self) -> None:
+        """Login with admin user."""
+        self.client.force_authenticate(user=self.admin_user)
+
     def test_create_book(self) -> None:
         """Test creating a new book."""
         url: str = reverse("books:create-book")

@@ -2,6 +2,7 @@
 
 from rest_framework.viewsets import ModelViewSet
 
+from rental_management.access_policies.book_api_access_policy import BookApiAccessPolicy
 from rental_management.models.book_model import Book
 from rental_management.serializers.book.book_serializer import BookSerializer
 
@@ -19,4 +20,5 @@ class BookViewSet(ModelViewSet):
 
     serializer_class = BookSerializer
     queryset = Book.objects.all()
+    permission_classes = [BookApiAccessPolicy]
     lookup_field = "book_id"

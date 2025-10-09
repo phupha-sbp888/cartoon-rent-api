@@ -2,7 +2,7 @@
 
 from rest_framework.viewsets import ModelViewSet
 
-from rental_management.access_policies.tag_api_acces_policy import TagApiAccessPolicy
+from rental_management.access_policies.tag_api_access_policy import TagApiAccessPolicy
 from rental_management.models.tag_model import Tag
 from rental_management.serializers.tag.tag_serializer import TagSerializer
 
