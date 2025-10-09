@@ -3,18 +3,21 @@
 from typing import Dict, Tuple
 
 from django.db import transaction
+from django.db.models import QuerySet
+from rest_access_policy.access_view_set_mixin import AccessViewSetMixin
 from rest_framework import status
 from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
 
+from rental_management.access_policies.rent_api_access_policy import RentApiAccessPolicy
 from rental_management.enums.book_status_type import BookStatusType
 from rental_management.models.rent_history_model import RentHistoryModel
 from rental_management.serializers.book.rent_history_serializer import RentHistorySerializer
 from rental_management.services.book_service import BookService
 
 
-class BookRentViewSet(ModelViewSet):
+class BookRentViewSet(AccessViewSetMixin, ModelViewSet):
     """CRUD viewset for book rent service.
 
     Viewset provide the following:
@@ -25,8 +28,8 @@ class BookRentViewSet(ModelViewSet):
     - DELETE (with book rent id): delete a specific book rent by ID
     """
 
-    queryset = RentHistoryModel.objects.all()
     serializer_class = RentHistorySerializer
+    access_policy = RentApiAccessPolicy
     lookup_field = "rent_id"
 
     @transaction.atomic
@@ -47,3 +50,7 @@ class BookRentViewSet(ModelViewSet):
             )
         rent_information_input_serializer.save()
         return Response(data=rent_information_input_serializer.data, status=status.HTTP_200_OK)
+
+    def get_queryset(self) -> QuerySet:
+        """Get scope query records categorized by access policy."""
+        return self.access_policy.scope_queryset(self.request, RentHistoryModel.objects.all())
