@@ -30,6 +30,7 @@ class GlobalApiAccessPolicy(AccessPolicy):
             "list": ActionOptions.READ_ALL.value,
             "create": ActionOptions.CREATE.value,
             "update": ActionOptions.UPDATE.value,
+            "partial_update": ActionOptions.UPDATE.value,
             "destroy": ActionOptions.DELETE.value,
         }
         role_with_selected_permission_action: List[int] = list(

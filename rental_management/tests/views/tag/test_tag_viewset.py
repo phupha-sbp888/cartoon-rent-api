@@ -16,7 +16,7 @@ from user_management.models.user_role_binding_model import UserRoleBinding
 from user_management.models.user_role_model import UserRole
 from user_management.models.user_role_permission_binding_model import UserRolePermissionBinding
 from user_management.models.user_role_permission_model import ActionOptions, UserRolePermission
-from user_management.tests.baker_recipe.user_recipe import admin_user_recipe
+from user_management.tests.baker_recipe.user_recipe import admin_user_recipe, normal_user_recipe
 
 
 class TestTagVieSet(APITestCase):
@@ -67,7 +67,7 @@ class TestTagVieSet(APITestCase):
 
         # Create normal user with permission
         normal_user_with_create_permission_role: User = Recipe(User).make()
-        normal_user_with_real_all_permission_role: User = Recipe(User).make()
+        normal_user_with_read_all_permission_role: User = Recipe(User).make()
         normal_user_with_update_permission_role: User = Recipe(User).make()
         normal_user_with_delete_permission_role: User = Recipe(User).make()
         normal_user_with_all_type_permission_role: User = Recipe(User).make()
@@ -77,7 +77,7 @@ class TestTagVieSet(APITestCase):
             UserRoleBinding, user_id=normal_user_with_create_permission_role, role_id=role_with_create_permission
         ).make()
         Recipe(
-            UserRoleBinding, user_id=normal_user_with_real_all_permission_role, role_id=role_with_read_all_permission
+            UserRoleBinding, user_id=normal_user_with_read_all_permission_role, role_id=role_with_read_all_permission
         ).make()
         Recipe(
             UserRoleBinding, user_id=normal_user_with_update_permission_role, role_id=role_with_update_permission
@@ -90,10 +90,11 @@ class TestTagVieSet(APITestCase):
         ).make()
 
         cls.normal_user_with_create_permission_role = normal_user_with_create_permission_role
-        cls.normal_user_with_real_all_permission_role = normal_user_with_real_all_permission_role
+        cls.normal_user_with_read_all_permission_role = normal_user_with_read_all_permission_role
         cls.normal_user_with_update_permission_role = normal_user_with_update_permission_role
         cls.normal_user_with_delete_permission_role = normal_user_with_delete_permission_role
         cls.normal_user_with_all_type_permission_role = normal_user_with_all_type_permission_role
+        cls.normal_user_without_role = normal_user_recipe.make()
 
     def setUp(self) -> None:
         """Login with admin user."""
@@ -106,6 +107,32 @@ class TestTagVieSet(APITestCase):
         response: Response = self.client.post(url, data=valid_tag_input)
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(response.data["name"], valid_tag_input["name"])
+
+    def test_create_tag_with_sufficient_permission(self) -> None:
+        """Test creating tag with normal user with role that has create."""
+        url: str = reverse("tags:create-tag")
+        self.client.force_authenticate(user=self.normal_user_with_create_permission_role)
+        valid_tag_input: Dict[str, str] = {"name": "test"}
+        response: Response = self.client.post(url, data=valid_tag_input)
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(response.data["name"], valid_tag_input["name"])
+
+    def test_create_tag_with_all_type_permission(self) -> None:
+        """Test creating tag with normal user with role that has all type permission."""
+        url: str = reverse("tags:create-tag")
+        self.client.force_authenticate(user=self.normal_user_with_all_type_permission_role)
+        valid_tag_input: Dict[str, str] = {"name": "test"}
+        response: Response = self.client.post(url, data=valid_tag_input)
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(response.data["name"], valid_tag_input["name"])
+
+    def test_create_tag_with_insufficient_permission(self) -> None:
+        """Test creating tag with normal user with role that does not have create permission."""
+        url: str = reverse("tags:create-tag")
+        self.client.force_authenticate(user=self.normal_user_with_read_all_permission_role)
+        valid_tag_input: Dict[str, str] = {"name": "test"}
+        response: Response = self.client.post(url, data=valid_tag_input)
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
     def test_create_tag_with_empty_name(self) -> None:
         """Test creating tag with empty name."""
@@ -129,9 +156,27 @@ class TestTagVieSet(APITestCase):
         self.assertEqual(response.data["count"], 1)
         self.assertEqual(response.data["results"], expected_result)
 
+    def test_list_tag_without_role(self) -> None:
+        """Test listing all tags with user that does not have any role."""
+        url: str = reverse("tags:list-tags")
+        expected_result: List[TagSerializer] = [TagSerializer(self.tag).data]
+        self.client.force_authenticate(user=self.normal_user_without_role)
+        response: Response = self.client.get(url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data["count"], 1)
+        self.assertEqual(response.data["results"], expected_result)
+
     def test_retrieve_tag_id(self) -> None:
         """Test getting tag information by id."""
         url: str = reverse("tags:retrieve-tag", args=[self.tag.tag_id])
+        response: Response = self.client.get(url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data["tag_id"], self.tag.tag_id)
+
+    def test_retrieve_tag_id_without_role(self) -> None:
+        """Test getting tag information by id with user that does not have any role."""
+        url: str = reverse("tags:retrieve-tag", args=[self.tag.tag_id])
+        self.client.force_authenticate(user=self.normal_user_without_role)
         response: Response = self.client.get(url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data["tag_id"], self.tag.tag_id)
@@ -151,6 +196,34 @@ class TestTagVieSet(APITestCase):
         self.assertEqual(response.data["name"], valid_tag_input["name"])
         self.assertEqual(response.data["created_by"], valid_tag_input["created_by"])
 
+    def test_update_tag_with_sufficient_permission(self) -> None:
+        """Test updating a tag information by id with user with role that has update permission."""
+        url: str = reverse("tags:update-tag", args=[self.tag.tag_id])
+        valid_tag_input: Dict[str, str] = {"name": "test_update", "created_by": self.admin_user.user_id}
+        self.client.force_authenticate(user=self.normal_user_with_update_permission_role)
+        response: Response = self.client.put(url, data=valid_tag_input)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data["name"], valid_tag_input["name"])
+        self.assertEqual(response.data["created_by"], valid_tag_input["created_by"])
+
+    def test_update_tag_with_all_type_permission(self) -> None:
+        """Test updating a tag information by id with user with role that has all type permission."""
+        url: str = reverse("tags:update-tag", args=[self.tag.tag_id])
+        valid_tag_input: Dict[str, str] = {"name": "test_update", "created_by": self.admin_user.user_id}
+        self.client.force_authenticate(user=self.normal_user_with_all_type_permission_role)
+        response: Response = self.client.put(url, data=valid_tag_input)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data["name"], valid_tag_input["name"])
+        self.assertEqual(response.data["created_by"], valid_tag_input["created_by"])
+
+    def test_update_tag_with_insufficient_permission(self) -> None:
+        """Test updating a tag information by id with user with role that does not have update permission."""
+        url: str = reverse("tags:update-tag", args=[self.tag.tag_id])
+        valid_tag_input: Dict[str, str] = {"name": "test_update", "created_by": self.admin_user.user_id}
+        self.client.force_authenticate(user=self.normal_user_with_delete_permission_role)
+        response: Response = self.client.put(url, data=valid_tag_input)
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
     def test_partial_update_tag(self) -> None:
         """Test partially updating a tag information by id."""
         url: str = reverse("tags:update-tag", args=[self.tag.tag_id])
@@ -159,8 +232,55 @@ class TestTagVieSet(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data["name"], valid_tag_input["name"])
 
+    def test_partial_update_tag_with_sufficient_permission(self) -> None:
+        """Test partially updating a tag information by id with user that has role with update permission."""
+        url: str = reverse("tags:update-tag", args=[self.tag.tag_id])
+        valid_tag_input: Dict[str, str] = {"name": "test_update"}
+        self.client.force_authenticate(user=self.normal_user_with_update_permission_role)
+        response: Response = self.client.patch(url, data=valid_tag_input)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data["name"], valid_tag_input["name"])
+
+    def test_partial_update_tag_with_all_type_permission(self) -> None:
+        """Test partially updating a tag information by id with user that has role with all type permission."""
+        url: str = reverse("tags:update-tag", args=[self.tag.tag_id])
+        valid_tag_input: Dict[str, str] = {"name": "test_update"}
+        self.client.force_authenticate(user=self.normal_user_with_all_type_permission_role)
+        response: Response = self.client.patch(url, data=valid_tag_input)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data["name"], valid_tag_input["name"])
+
+    def test_partial_update_tag_with_insufficient_permission(self) -> None:
+        """Test partially updating a tag information by id with user that does not have permission."""
+        url: str = reverse("tags:update-tag", args=[self.tag.tag_id])
+        valid_tag_input: Dict[str, str] = {"name": "test_update"}
+        self.client.force_authenticate(user=self.normal_user_without_role)
+        response: Response = self.client.patch(url, data=valid_tag_input)
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
     def test_delete_tag(self) -> None:
         """Test deleting tag with ID."""
         url: str = reverse("tags:delete-tag", args=[self.tag.tag_id])
         response: Response = self.client.delete(url)
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+
+    def test_delete_tag_with_sufficient_permission(self) -> None:
+        """Test deleting tag with ID with user that has role with delete permission."""
+        url: str = reverse("tags:delete-tag", args=[self.tag.tag_id])
+        self.client.force_authenticate(user=self.normal_user_with_delete_permission_role)
+        response: Response = self.client.delete(url)
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+
+    def test_delete_tag_with_all_type_permission(self) -> None:
+        """Test deleting tag with ID with user that has role with all type permission."""
+        url: str = reverse("tags:delete-tag", args=[self.tag.tag_id])
+        self.client.force_authenticate(user=self.normal_user_with_all_type_permission_role)
+        response: Response = self.client.delete(url)
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+
+    def test_delete_tag_with_insufficient_permission(self) -> None:
+        """Test deleting tag with ID with user that has role without delete permission."""
+        url: str = reverse("tags:delete-tag", args=[self.tag.tag_id])
+        self.client.force_authenticate(user=self.normal_user_with_create_permission_role)
+        response: Response = self.client.delete(url)
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
