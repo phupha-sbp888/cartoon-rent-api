@@ -2,6 +2,7 @@
 
 from rest_framework.viewsets import ModelViewSet
 
+from rental_management.access_policies.tag_api_acces_policy import TagApiAccessPolicy
 from rental_management.models.book_tag_binding_model import BookTagBinding
 from rental_management.serializers.tag.tag_binding_serializer import TagBindingSerializer
 
@@ -19,4 +20,5 @@ class TagBindingViewSet(ModelViewSet):
 
     queryset = BookTagBinding.objects.all()
     serializer_class = TagBindingSerializer
+    permission_classes = [TagApiAccessPolicy]
     lookup_field = "book_tag_binding_id"

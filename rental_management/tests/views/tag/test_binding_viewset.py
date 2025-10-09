@@ -30,6 +30,10 @@ class TestTagVieSet(APITestCase):
         cls.tag_2 = tag_2_recipe.make()
         cls.available_book = available_book
 
+    def setUp(self) -> None:
+        """Login with admin user."""
+        self.client.force_authenticate(user=self.admin_user)
+
     def test_assign_tag_to_book(self) -> None:
         """Test assigning a tag to book."""
         url: str = reverse("tags:assign-tags")
