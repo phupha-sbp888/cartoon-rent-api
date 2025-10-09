@@ -2,6 +2,7 @@
 
 from rest_framework.viewsets import ModelViewSet
 
+from rental_management.access_policies.global_api_access_policy import GlobalApiAccessPolicy
 from rental_management.models.tag_model import Tag
 from rental_management.serializers.tag.tag_serializer import TagSerializer
 
@@ -19,4 +20,5 @@ class TagViewSet(ModelViewSet):
 
     queryset = Tag.objects.all()
     serializer_class = TagSerializer
+    permission_classes = [GlobalApiAccessPolicy]
     lookup_field = "tag_id"

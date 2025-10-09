@@ -12,7 +12,7 @@ from user_management.models.user_role_permission_binding_model import UserRolePe
 from user_management.models.user_role_permission_model import ActionOptions
 
 
-class RentalApiAccessPolicy(AccessPolicy):
+class GlobalApiAccessPolicy(AccessPolicy):
     """Global access policy for controlling user access to rental service APIs."""
 
     statements = [
