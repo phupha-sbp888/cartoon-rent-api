@@ -9,3 +9,4 @@ class RentStatusType(models.TextChoices):
     IN_PROGRESS = 'IN_PROGRESS'
     COMPLETED = 'COMPLETED'
     OVERDUE = 'OVERDUE'
+    UNPAID = 'UNPAID'

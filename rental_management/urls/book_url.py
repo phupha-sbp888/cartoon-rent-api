@@ -3,6 +3,7 @@
 from django.urls import path
 
 from rental_management.views.book.book_rent_viewset import BookRentViewSet
+from rental_management.views.book.book_return_view import BookReturnView
 from rental_management.views.book.book_review_viewset import BookReviewViewSet
 from rental_management.views.book.book_viewset import BookViewSet
 
@@ -30,4 +31,5 @@ book_urls = [
         name="update-book-rent",
     ),
     path("rent/delete/<int:rent_id>", BookRentViewSet.as_view({"delete": "destroy"}), name="delete-book-rent"),
+    path("return/<int:book_id>", BookReturnView.as_view(), name="return-book"),
 ]
