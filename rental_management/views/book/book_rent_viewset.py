@@ -12,6 +12,7 @@ from rest_framework.viewsets import ModelViewSet
 
 from rental_management.access_policies.rent_api_access_policy import RentApiAccessPolicy
 from rental_management.enums.book_status_type import BookStatusType
+from rental_management.enums.rent_status_type import RentStatusType
 from rental_management.models.rent_history_model import RentHistoryModel
 from rental_management.serializers.book.rent_history_serializer import RentHistorySerializer
 from rental_management.services.book_service import BookService
@@ -37,6 +38,16 @@ class BookRentViewSet(AccessViewSetMixin, ModelViewSet):
         """Create a book rent service and update book status."""
         rent_information_input_serializer: RentHistorySerializer = self.get_serializer(data=request.data)
         rent_information_input_serializer.is_valid(raise_exception=True)
+
+        # Verify if user has an unpaid book rent records.
+        unpaid_rent_records: QuerySet = self.get_queryset().filter(
+            user_id=rent_information_input_serializer.validated_data["user_id"], status=RentStatusType.UNPAID.value
+        )
+        if unpaid_rent_records.exists():
+            return Response(
+                data={"detail": "Can not borrow book because you have unpaid rent penalty fee"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
 
         # Update book status from available to rented book
         book_update_status: bool = BookService.update_book_status(

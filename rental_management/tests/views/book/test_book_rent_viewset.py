@@ -49,7 +49,7 @@ class TestBookRentViewSet(APITestCase):
         rented_book_1 = rented_book_1_recipe.make()
         rented_book_2 = rented_book_2_recipe.make()
         cls.rent_history_1 = Recipe(
-            RentHistoryModel, user_id=book_rent_user_1, book_id=rented_book_1, status=RentStatusType.IN_PROGRESS.value
+            RentHistoryModel, user_id=book_rent_user_1, book_id=rented_book_1, status=RentStatusType.UNPAID.value
         ).make()
         cls.rent_history_2 = Recipe(
             RentHistoryModel, user_id=book_rent_user_2, book_id=rented_book_2, status=RentStatusType.IN_PROGRESS.value
@@ -121,7 +121,7 @@ class TestBookRentViewSet(APITestCase):
         url: str = reverse("books:create-book-rent")
         current_datetime: datetime = timezone.now()
         valid_book_rent_record_input: Dict[str, Union[str, int]] = {
-            "user_id": self.book_rent_user_1.user_id,
+            "user_id": self.book_rent_user_2.user_id,
             "book_id": self.available_book.book_id,
             "rented_date": current_datetime.strftime("%Y-%m-%dT%H:%M:%SZ"),
         }
@@ -195,12 +195,24 @@ class TestBookRentViewSet(APITestCase):
         url: str = reverse("books:create-book-rent")
         current_datetime: datetime = timezone.now()
         invalid_book_rent_record_input: Dict[str, Union[str, int]] = {
-            "user_id": self.book_rent_user_1.user_id,
+            "user_id": self.book_rent_user_2.user_id,
             "book_id": self.unverify_book_record.book_id,
             "rented_date": current_datetime.strftime("%Y-%m-%dT%H:%M:%SZ"),
         }
         response: Response = self.client.post(url, data=invalid_book_rent_record_input)
         self.assertEqual(response.status_code, status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+    def test_create_book_rent_record_with_unpaid_late_fee(self) -> None:
+        """Test renting book with user that has unpaid rent record."""
+        url: str = reverse("books:create-book-rent")
+        current_datetime: datetime = timezone.now()
+        invalid_book_rent_record_input: Dict[str, Union[str, int]] = {
+            "user_id": self.book_rent_user_1.user_id,
+            "book_id": self.unverify_book_record.book_id,
+            "rented_date": current_datetime.strftime("%Y-%m-%dT%H:%M:%SZ"),
+        }
+        response: Response = self.client.post(url, data=invalid_book_rent_record_input)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_update_book_rent_record(self) -> None:
         """Test updating book rent record."""
