@@ -139,6 +139,23 @@ class TestBookReviewViewset(APITestCase):
         self.assertEqual(response.data["book_id"], valid_review_update_input["book_id"])
         self.assertFalse(response.data["is_recommended"])
 
+    def test_update_book_review_with_normal_user(self) -> None:
+        """Test updating book review by owner."""
+        url: str = reverse("books:update-book-review", args=[self.review.review_id])
+        valid_review_update_input: Dict[str, str] = {
+            "user_id": self.review_user.user_id,
+            "book_id": self.book.book_id,
+            "is_recommended": False,
+            "review_detail": "updated ereview detail",
+        }
+        self.client.force_authenticate(user=self.review_user)
+        response: Response = self.client.put(url, data=valid_review_update_input)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data["review_id"], self.review.review_id)
+        self.assertEqual(response.data["user_id"], valid_review_update_input["user_id"])
+        self.assertEqual(response.data["book_id"], valid_review_update_input["book_id"])
+        self.assertFalse(response.data["is_recommended"])
+
     def test_partial_update_book_review(self) -> None:
         """Test partially updating book review information by id."""
         url: str = reverse("books:update-book-review", args=[self.review.review_id])

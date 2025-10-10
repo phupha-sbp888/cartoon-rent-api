@@ -43,7 +43,7 @@ class BookReturnView(UpdateAPIView):
         # check if book is already returned or out of service
         if selected_return_book.status == BookStatusType.OUT_OF_SERVICE:
             return Response(data={"detail": "Book is out of service"}, status=status.HTTP_400_BAD_REQUEST)
-        elif not book_rent_record or selected_return_book.status == BookStatusType.AVAILABLE:
+        if not book_rent_record or selected_return_book.status == BookStatusType.AVAILABLE:
             return Response(data={"detail": "Book is already returned"}, status=status.HTTP_400_BAD_REQUEST)
 
         # Update book and rent record status

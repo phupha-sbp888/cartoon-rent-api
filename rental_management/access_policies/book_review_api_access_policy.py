@@ -31,6 +31,6 @@ class BookReviewApiAccessPolicy(GlobalApiAccessPolicy):
         """
         if action == "update" or action == "partial_update":
             book_review: BookReview = view.get_object()
-            if book_review.user_id == request.user.user_id:
+            if book_review.user_id == request.user:
                 return True
         return super().has_role_permission(request, view, action)
