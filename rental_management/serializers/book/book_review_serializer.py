@@ -11,6 +11,8 @@ class BookReviewSerializer(serializers.ModelSerializer):
     Validating input and serialize output for book review related endpoints.
     """
 
+    is_recommended = serializers.BooleanField(default=True)
+
     class Meta:
         """Set up fields for serializing book review model."""
 

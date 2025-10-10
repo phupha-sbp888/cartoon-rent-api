@@ -8,10 +8,12 @@ from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.test import APITestCase
 
+from rental_management.enums.rent_status_type import RentStatusType
 from rental_management.models.book_review_model import BookReview
+from rental_management.models.rent_history_model import RentHistoryModel
 from rental_management.serializers.book.book_review_serializer import BookReviewSerializer
-from rental_management.tests.baker_recipe.book_recipe import available_book_recipe
-from user_management.tests.baker_recipe.user_recipe import normal_user_recipe
+from rental_management.tests.baker_recipe.book_recipe import available_book_2_recipe, available_book_recipe
+from user_management.tests.baker_recipe.user_recipe import admin_user_recipe, normal_user_recipe
 
 
 class TestBookReviewViewset(APITestCase):
@@ -21,17 +23,30 @@ class TestBookReviewViewset(APITestCase):
     def setUpTestData(cls) -> None:
         """Set up test data."""
         book = available_book_recipe.make()
+        available_book_for_rent = available_book_2_recipe.make()
         review_user = normal_user_recipe.make()
         cls.review = Recipe(BookReview, user_id=review_user, book_id=book).make()
+        cls.rented_record = Recipe(
+            RentHistoryModel,
+            user_id=review_user,
+            book_id=available_book_for_rent,
+            status=RentStatusType.COMPLETED.value,
+        ).make()
+        cls.available_book_for_rent = available_book_for_rent
         cls.review_user = review_user
+        cls.admin_user = admin_user_recipe.make()
         cls.book = book
+
+    def setUp(self) -> None:
+        """Login with admin user."""
+        self.client.force_authenticate(user=self.admin_user)
 
     def test_create_book_review(self) -> None:
         """Test creating a new book review."""
         url: str = reverse("books:create-book-review")
         valid_review_input: Dict[str, str] = {
             "user_id": self.review_user.user_id,
-            "book_id": self.book.book_id,
+            "book_id": self.available_book_for_rent.book_id,
             "review_detail": "test review detail",
             "is_recommended": True,
         }
@@ -40,6 +55,18 @@ class TestBookReviewViewset(APITestCase):
         self.assertEqual(response.data["user_id"], valid_review_input["user_id"])
         self.assertEqual(response.data["book_id"], valid_review_input["book_id"])
         self.assertTrue(response.data["is_recommended"])
+
+    def test_create_book_review_without_renting(self) -> None:
+        """Test creating a new book review before renting the actual book."""
+        url: str = reverse("books:create-book-review")
+        valid_review_input: Dict[str, str] = {
+            "user_id": self.review_user.user_id,
+            "book_id": self.book.book_id,
+            "review_detail": "test review detail",
+            "is_recommended": True,
+        }
+        response: Response = self.client.post(url, data=valid_review_input)
+        self.assertEqual(response.status_code, status.HTTP_422_UNPROCESSABLE_ENTITY)
 
     def test_create_review_with_missing_user_id(self) -> None:
         """Test creating a new book review without giving user id."""

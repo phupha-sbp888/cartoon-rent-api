@@ -16,6 +16,7 @@ class GlobalApiAccessPolicy(AccessPolicy):
     """Global access policy for controlling user access to rental service APIs."""
 
     statements = [
+        {"action": ["retrieve", "list"], "principal": "authenticated", "effect": "allow"},
         {"action": ["*"], "principal": "authenticated", "effect": "allow", "condition": "has_role_permission"},
         {"action": ["*"], "principal": "*", "effect": "allow", "condition": "is_admin"},
     ]
